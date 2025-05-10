@@ -18,6 +18,15 @@
     <ClCompile Include="GTA_ENTICity.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="Peaton.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="CarlMovement.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map.h">
@@ -26,7 +35,7 @@
     <ClInclude Include="Peaton.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Cash.h">
+    <ClInclude Include="CarlMovement.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

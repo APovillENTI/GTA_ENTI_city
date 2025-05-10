@@ -127,10 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CarlMovement.cpp" />
     <ClCompile Include="GTA_ENTICity.cpp" />
+    <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Peaton.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cash.h" />
+    <ClInclude Include="CarlMovement.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Peaton.h" />
   </ItemGroup>

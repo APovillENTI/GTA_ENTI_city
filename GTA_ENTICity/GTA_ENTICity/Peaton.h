@@ -1,4 +1,5 @@
 const char WALL = '=';
+const char PEATON = 'P';
 
 struct Peaton
 {
