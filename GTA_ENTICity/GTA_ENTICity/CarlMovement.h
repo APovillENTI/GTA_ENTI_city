@@ -18,6 +18,7 @@ const int FRAME_DELAY = 1000 / FPS;
 #define KEY_ESC VK_ESCAPE
 
 bool KeyPressed(int key);
+void GameLoop(Carl carl, char** map, int mapRows, int mapCols);
 
 struct Carl {
     int x, y;
