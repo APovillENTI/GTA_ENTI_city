@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CarlMovement.cpp" />
     <ClCompile Include="GTA_ENTICity.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Peaton.cpp" />

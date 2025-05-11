@@ -1,63 +1,51 @@
 #include <Windows.h>
 #include "Map.h"
-#include "Peaton.h"
-
-const char UP = '^';
-const char DOWN = 'v';
-const char LEFT = '<';
-const char RIGHT = '>';
-
-const int FPS = 60;
-const int FRAME_DELAY = 1000 / FPS;
 
 #define KEY_UP VK_UP
 #define KEY_DOWN VK_DOWN
 #define KEY_LEFT VK_LEFT
 #define KEY_RIGHT VK_RIGHT
 #define KEY_ATTACK VK_SPACE
-#define KEY_ESC VK_ESCAPE
 
-bool KeyPressed(int key);
-void GameLoop(Carl carl, char** map, int mapRows, int mapCols);
+bool KeyPressed(int key) 
+{
+    return (GetAsyncKeyState(key) & 0x8000) != 0;
+}
 
-struct Carl {
-    int x, y;
-    char direction;
-    int dinero;
+void MoverCarl(Carl& cj, char** mapa, const Config& config) 
+{
+    int dx = 0;
+    int dy = 0;
+    char dir = cj.direccion;
 
-    Carl() {
-        x = 0;
-        y = 0;
-        direction = UP;
-        dinero = 0;
+    if (KeyPressed(KEY_UP)) 
+    { 
+        dy = -1; dir = '^'; 
+    }
+    else if (KeyPressed(KEY_DOWN)) 
+    { 
+        dy = 1; dir = 'v'; 
+    }
+    else if (KeyPressed(KEY_LEFT)) 
+    {
+        dx = -1; dir = '<'; 
+    }
+    else if (KeyPressed(KEY_RIGHT)) 
+    { 
+        dx = 1; dir = '>'; 
     }
 
-    void MoveCarl(int filasMapa, int columnasMapa, char** map) 
-	{
-        map[x][y] = EMPTY;
-        if (KeyPressed(KEY_UP)) {
-            if (map[x][y - 1] != WALL && map[x][y - 1] != PEATON)
-                y--;
-            direction = UP;
-        }
-        else if (KeyPressed(KEY_DOWN)) {
-            if (map[x][y + 1] != WALL && map[x][y + 1] != PEATON)
-                y++;
-            direction = DOWN;
-        }
-        else if (KeyPressed(KEY_LEFT)) {
-            if (map[x - 1][y] != WALL && map[x - 1][y] != PEATON)
-                x--;
-            direction = LEFT;
-        }
-        else if (KeyPressed(KEY_RIGHT)) {
-            if (map[x + 1][y] != WALL && map[x + 1][y] != PEATON)
-                x++;
-            direction = RIGHT;
-        }
+    int newX = cj.x + dx;
+    int newY = cj.y + dy;
 
-        map[x][y] = direction;
+    // Comprobar colision con paredes
+    if (newX >= 0 && newX < config.anchoMapa && newY >= 0 && newY < config.altoMapa) 
+    {
+        if (mapa[newY][newX] != WALL) 
+        {
+            cj.x = newX;
+            cj.y = newY;
+            cj.direccion = dir;
+        }
     }
-};
-
-
+}
