@@ -21,14 +21,16 @@ private:
     std::vector<Car> cars;
     std::vector<Money> moneyDrops;
     int maxMoney;
+    int pedestrianHealth;
+    int pedestrianAttackPower;
     int numCars;
 
     void GenerateRandomPosition(int mapWidth, int mapHeight, int& x, int& y) const;
     void DropMoney(int x, int y, const Map& gameMap);
 
 public:
-    Island(int id, int numPeatones, int maxMoneyAmount);
-    Island(int id, int numPeatones, int maxMoneyAmount, int numCarAmount);
+    Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower);
+    Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower, int numCarAmount);
 
     void GenerateInitialPeatones(int mapWidth, int mapHeight);
     void GenerateInitialCars(int mapWidth, int mapHeight);

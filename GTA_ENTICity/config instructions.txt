@@ -1,0 +1,7 @@
+1st(MAP):	width		; height
+2nd(CJ):	CJ's health	; CJ's attack power
+3rd(BRIDGE):	Money to SF	; Money to LV
+4th(LS PED.):	Nº pedestrians	; Max Money from pedestrian	; Pedestrian's health	; Pedestrian's power
+5th(SF PED):	Nº pedestrians	; Max Money from pedestrian	; Pedestrian's health	; Pedestrian's power
+6th(LV PED):	Nº pedestrians	; Max Money from pedestrian	; Pedestrian's health	; Pedestrian's power
+7TH(CARS):	Nº cars LS	; Nº cars SF			; Nº cars LV	

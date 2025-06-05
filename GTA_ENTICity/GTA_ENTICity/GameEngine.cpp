@@ -27,12 +27,14 @@ bool GameEngine::Initialize(const std::string& configFile)
 
     // Initialize player at starting position
     player.SetPosition(2, gameMap.GetHeight() / 2);
+    player.SetHealth(config.GetCjHp());
+    player.SetPower(config.GetCjPwr());
 
     // Initialize islands
     islands.clear();
-    islands.emplace_back(0, config.GetNumPeatonesLS(), config.GetMaxDineroLS(), config.GetNumCochesLS());
-    islands.emplace_back(1, config.GetNumPeatonesSF(), config.GetMaxDineroSF(), config.GetNumCochesSF());
-    islands.emplace_back(2, 10, 50, config.GetNumCochesLV()); // Las Venturas - change later
+    islands.emplace_back(0, config.GetNumPeatonesLS(), config.GetMaxDineroLS(), config.GetMaxHealthLS(), config.GetPwrLS(), config.GetNumCochesLS());
+    islands.emplace_back(1, config.GetNumPeatonesSF(), config.GetMaxDineroSF(), config.GetMaxHealthSF(), config.GetPwrSF(), config.GetNumCochesSF());
+    islands.emplace_back(2, config.GetNumPeatonesLV(), config.GetMaxDineroLV(), config.GetMaxHealthLV(), config.GetPwrLV(), config.GetNumCochesLV()); // Las Venturas - change later
 
     // Generate initial peatones and cars for each island
     for (Island& island : islands)
@@ -96,7 +98,7 @@ void GameEngine::ProcessInput()
         }
         Sleep(100); // Prevent rapid key presses
     }
-
+    
     // Movement, WASD not asked for but implemented for ease of mind
     if (KeyPressed('W') || KeyPressed(VK_UP))
     {
@@ -160,6 +162,7 @@ void GameEngine::Render()
 
     // Display player stats
     std::cout << "Money: $" << player.GetMoney() << std::endl;
+    std::cout << "HP: " << player.GetHealth() << std::endl;
     // std::cout << "Position: (" << player.GetX() << ", " << player.GetY() << ")" << std::endl; // DEBUG
 
     if (player.IsDriving())

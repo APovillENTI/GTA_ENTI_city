@@ -21,12 +21,28 @@ class Config
 private:
     int mapWidth;
     int mapHeight;
-    int numPeatonesLS;
+
+    int CJ_hp;
+    int CJ_pwr;
+
     int dineroCruzarSF;
-    int maxDineroLS;
-    int numPeatonesSF;
     int dineroCruzarLV;
+
+    int numPeatonesLS;
+    int maxDineroLS;
+    int maxHealthLS;
+    int pwrLS;
+
+    int numPeatonesSF;
     int maxDineroSF;
+    int maxHealthSF;
+    int pwrSF;
+
+    int numPeatonesLV;
+    int maxDineroLV;
+    int maxHealthLV;
+    int pwrLV;
+
     int numCochesLS;
     int numCochesSF;
     int numCochesLV;
@@ -38,12 +54,28 @@ public:
     // Getters
     int GetMapWidth() const { return mapWidth; }
     int GetMapHeight() const { return mapHeight; }
-    int GetNumPeatonesLS() const { return numPeatonesLS; }
+
+    int GetCjHp() const { return CJ_hp; }
+    int GetCjPwr() const { return CJ_pwr; }
+
     int GetDineroCruzarSF() const { return dineroCruzarSF; }
-    int GetMaxDineroLS() const { return maxDineroLS; }
-    int GetNumPeatonesSF() const { return numPeatonesSF; }
     int GetDineroCruzarLV() const { return dineroCruzarLV; }
+
+    int GetNumPeatonesLS() const { return numPeatonesLS; }
+    int GetMaxDineroLS() const { return maxDineroLS; }
+    int GetMaxHealthLS() const { return maxHealthLS; }
+    int GetPwrLS() const { return pwrLS; }
+
+    int GetNumPeatonesSF() const { return numPeatonesSF; }
     int GetMaxDineroSF() const { return maxDineroSF; }
+    int GetMaxHealthSF() const { return maxHealthSF; }
+    int GetPwrSF() const { return pwrSF; }
+
+    int GetNumPeatonesLV() const { return numPeatonesLV; }
+    int GetMaxDineroLV() const { return maxDineroLV; }
+    int GetMaxHealthLV() const { return maxHealthLV; }
+    int GetPwrLV() const { return pwrLV; }
+
     int GetNumCochesLS() const { return numCochesLS; }
     int GetNumCochesSF() const { return numCochesSF; }
     int GetNumCochesLV() const { return numCochesLV; }
@@ -55,6 +87,8 @@ private:
     Cell** cells;
     int width;
     int height;
+    int moneyLS;
+    int moneySF;
 
     void CreateBridges();
 
@@ -64,10 +98,14 @@ public:
 
     bool Initialize(const Config& config);
     void Cleanup();
+    void EraseBridge(int x, int y) const;
 
     bool IsWalkable(int x, int y) const;
+    bool IsBridge(int x, int y) const;
     char GetCellDisplayChar(int x, int y) const;
-
+    
+    int GetMoneyLS() const { return moneyLS; }
+    int GetMoneySF() const { return moneySF; }
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
 };

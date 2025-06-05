@@ -3,13 +3,15 @@
 #include <cmath>
 #include <algorithm>
 
-Island::Island(int id, int numPeatones, int maxMoneyAmount) : islandId(id), maxMoney(maxMoneyAmount), numCars(0)
+Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower) : islandId(id), maxMoney(maxMoneyAmount), 
+pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(0)
 {
     peatones.reserve(numPeatones);
     moneyDrops.reserve(20);
 }
 
-Island::Island(int id, int numPeatones, int maxMoneyAmount, int numCarAmount) : islandId(id), maxMoney(maxMoneyAmount), numCars(numCarAmount)
+Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower, int numCarAmount) : islandId(id), maxMoney(maxMoneyAmount),
+pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(numCarAmount)
 {
     peatones.reserve(numPeatones);
     cars.reserve(numCars);
@@ -33,7 +35,7 @@ void Island::GenerateInitialPeatones(int mapWidth, int mapHeight)
     {
         int x, y;
         GenerateRandomPosition(mapWidth, mapHeight, x, y);
-        peatones.emplace_back(x, y, islandId);
+        peatones.emplace_back(x, y, pedestrianHealth, pedestrianAttackPower, islandId);
     }
 }
 
@@ -104,8 +106,12 @@ void Island::ProcessPlayerAttack(const Player& player, const Map& gameMap)
     {
         if (!peaton.IsDead() && player.IsAdjacentTo(peaton.GetX(), peaton.GetY()))
         {
-            peaton.Kill();
-            DropMoney(peaton.GetX(), peaton.GetY(), gameMap);
+            peaton.GetDamage(player.GetPower());
+            if (peaton.GetHP() <= 0)
+            {
+                peaton.Kill();
+                DropMoney(peaton.GetX(), peaton.GetY(), gameMap);
+            }
             break; //break so we dont hit 2 peatones at a time
         }
     }

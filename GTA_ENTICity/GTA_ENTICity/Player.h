@@ -18,8 +18,11 @@ private:
     int y;
     Direction direction;
     int money;
+    int health;
+    int attackPower;
     Car* currentCar; // Pointer to the car being driven
     bool isDriving;
+    bool inSanFiero;
 
 public:
     Player();
@@ -32,11 +35,16 @@ public:
     int GetMoney() const { return money; }
     bool IsDriving() const { return isDriving; }
     Car* GetCurrentCar() const { return currentCar; }
+    int GetHealth() const { return health; }
+    int GetPower() const { return attackPower; }
+    bool InSF() const { return inSanFiero; }
 
     // Display
     char GetDirectionChar() const;
 
     // Setters
+    void SetHealth(int newHealth);
+    void SetPower(int newPwr);
     void SetPosition(int newX, int newY);
     void SetDirection(Direction newDir);
     void AddMoney(int amount);

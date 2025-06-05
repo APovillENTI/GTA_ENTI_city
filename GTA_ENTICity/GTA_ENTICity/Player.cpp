@@ -3,9 +3,9 @@
 #include <cmath>
 #include <cstdlib>
 
-Player::Player() : x(0), y(0), direction(Direction::DOWN), money(0), currentCar(nullptr), isDriving(false){}
+Player::Player() : x(0), y(0), direction(Direction::DOWN), money(0), attackPower(0), health(100), currentCar(nullptr), isDriving(false), inSanFiero(false) {}
 
-Player::Player(int startX, int startY, Direction startDir) : x(startX), y(startY), direction(startDir), money(0), currentCar(nullptr), isDriving(false){}
+Player::Player(int startX, int startY, Direction startDir) : x(startX), y(startY), direction(startDir), attackPower(0), health(100), money(0), currentCar(nullptr), isDriving(false), inSanFiero(false) {}
 
 char Player::GetDirectionChar() const
 {
@@ -26,6 +26,16 @@ char Player::GetDirectionChar() const
         default:
             return 'v';
     }
+}
+
+void Player::SetHealth(int newHealth)
+{
+    health = newHealth;
+}
+
+void Player::SetPower(int newPwr)
+{
+    attackPower = newPwr;
 }
 
 void Player::SetPosition(int newX, int newY)
@@ -58,6 +68,29 @@ bool Player::Move(int dx, int dy, const Map& gameMap)
 
         if (gameMap.IsWalkable(newX, newY))
         {
+            if (gameMap.IsBridge(newX, newY))
+            {
+                if (inSanFiero)
+                {
+                    if (money >= gameMap.GetMoneySF())
+                    {
+                        money -= gameMap.GetMoneySF();
+                        gameMap.EraseBridge(newX, newY);
+                    }
+                    else
+                        return false;
+                }
+                else
+                {
+                    if (money >= gameMap.GetMoneyLS())
+                    {
+                        money -= gameMap.GetMoneyLS();
+                        gameMap.EraseBridge(newX, newY);
+                    }
+                    else
+                        return false;
+                }           
+            }
             x = newX;
             y = newY;
             return true;
