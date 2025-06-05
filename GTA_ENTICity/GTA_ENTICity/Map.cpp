@@ -1,124 +1,165 @@
 #include "Map.h"
-#include "Peaton.h"
-#include <iostream>
+#include "Player.h"
+#include "GameEngine.h"
 #include <fstream>
-#include <cstdlib>
+#include <sstream>
 
-void LeerConfig(const std::string& archivo, Config& config) 
+Config::Config() : mapWidth(0), mapHeight(0), numPeatonesLS(0),dineroCruzarSF(0), maxDineroLS(0), numPeatonesSF(0),dineroCruzarLV(0), maxDineroSF(0), numCochesLS(0), numCochesSF(0), numCochesLV(0){}
+
+bool Config::LoadFromFile(const std::string& filename)
 {
-    std::ifstream f(archivo);
-    std::string linea;
+    std::ifstream file(filename);
 
-    // Leer dimensiones del mapa
-    getline(f, linea);
-    size_t sep = linea.find(';');
-    config.anchoMapa = std::stoi(linea.substr(0, sep));
-    config.altoMapa = std::stoi(linea.substr(sep + 1));
+    if (!file.is_open())
+    {
+        return false;
+    }
 
-    // Leer datos de Los Santos
-    getline(f, linea);
-    sep = linea.find(';');
-    config.numPeatonesLS = std::stoi(linea.substr(0, sep));
-    linea = linea.substr(sep + 1);
-    sep = linea.find(';');
-    config.dineroCruzarSF = std::stoi(linea.substr(0, sep));
-    config.maxDineroLS = std::stoi(linea.substr(sep + 1));
+    std::string line;
 
-    // Leer datos de San Fierro
-    getline(f, linea);
-    sep = linea.find(';');;
-    config.numPeatonesSF = std::stoi(linea.substr(0, sep));
-    linea = linea.substr(sep + 1);
-    sep = linea.find(';');
-    config.dineroCruzarLV = std::stoi(linea.substr(0, sep));
-    config.maxDineroSF = std::stoi(linea.substr(sep + 1));
+    // dimentions
+    if (getline(file, line))
+    {
+        size_t sep = line.find(';');
+        if (sep != std::string::npos)
+        {
+            mapWidth = std::stoi(line.substr(0, sep));
+            mapHeight = std::stoi(line.substr(sep + 1));
+        }
+    }
+
+    // Los Santos
+    if (getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+
+        if (getline(iss, token, ';')) numPeatonesLS = std::stoi(token);
+        if (getline(iss, token, ';')) dineroCruzarSF = std::stoi(token);
+        if (getline(iss, token, ';')) maxDineroLS = std::stoi(token);
+    }
+
+    //  San Fierro
+    if (getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+
+        if (getline(iss, token, ';')) numPeatonesSF = std::stoi(token);
+        if (getline(iss, token, ';')) dineroCruzarLV = std::stoi(token);
+        if (getline(iss, token, ';')) maxDineroSF = std::stoi(token);
+    }
+
+    // num cars
+    if (getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+
+        if (getline(iss, token, ';')) numCochesLS = std::stoi(token);
+        if (getline(iss, token, ';')) numCochesSF = std::stoi(token);
+        if (getline(iss, token, ';')) numCochesLV = std::stoi(token);
+    }
+
+    file.close();
+    return true;
 }
 
-void InicializarMapa(char**& mapa, const Config& config) 
+Map::Map() : cells(nullptr), width(0), height(0)
 {
-    mapa = new char* [config.altoMapa]; // crear memoria prar las  columnas
+}
 
-    for (int i = 0; i < config.altoMapa; i++) 
+Map::~Map()
+{
+    Cleanup();
+}
+
+bool Map::Initialize(const Config& config)
+{
+    width = config.GetMapWidth();
+    height = config.GetMapHeight();
+
+    // allocate memory
+    cells = new Cell * [height];
+    for (int i = 0; i < height; i++)
     {
-        mapa[i] = new char[config.anchoMapa];// alocar memoria para as filas
+        cells[i] = new Cell[width];
 
-        for (int j = 0; j < config.anchoMapa; j++) 
+        for (int j = 0; j < width; j++)
         {
-            if (i == 0 || i == config.altoMapa - 1 || j == 0 || j == config.anchoMapa - 1) // si se encuentra en el borde
+            // detect borders
+            if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
             {
-                mapa[i][j] = WALL;
+                cells[i][j] = Cell(CellType::WALL);
             }
-            else 
+            else
             {
-                mapa[i][j] = EMPTY;
+                cells[i][j] = Cell(CellType::EMPTY);
             }
         }
     }
 
-    // Crear puentes entre islas
-    int sep1 = config.anchoMapa / 3;
-    int sep2 = 2 * config.anchoMapa / 3; //valor y (horizontal) de cada separacion
-
-    for (int i = 1; i < config.altoMapa - 1; i++) 
-    {
-        mapa[i][sep1] = WALL;
-        mapa[i][sep2] = WALL;
-    }
-    mapa[config.altoMapa / 2][sep1] = EMPTY;
-    mapa[config.altoMapa / 2][sep2] = EMPTY;
+    CreateBridges();
+    return true;
 }
 
-void DibujarVista(char** mapa, const Carl& cj, const Config& config, const std::vector<Peaton>& peatones)
+void Map::CreateBridges()
 {
-    system("cls");
+    int sep1 = width / 3;
+    int sep2 = 2 * width / 3;
 
-    int vistaAncho = 21, vistaAlto = 21;
-
-    int inicioX = cj.x - vistaAncho / 2;
-    int inicioY = cj.y - vistaAlto / 2;
-
-    for (int i = inicioY; i < inicioY + vistaAlto; i++) 
+    for (int i = 1; i < height - 1; i++)
     {
-        for (int j = inicioX; j < inicioX + vistaAncho; j++) 
-        {
-            if (i == cj.y && j == cj.x) //imprimir cj
-            {
-                std::cout << cj.direccion;
-                continue;
-            }
-            if (i < 0 || j < 0 || i >= config.altoMapa || j >= config.anchoMapa) 
-            {
-                std::cout << EMPTY;
-                continue;
-            }
-
-            // Dibujar dinero
-            bool hayDinero = false;
-            for (const Dinero& d : dineroGlobal) //para cada dinero en la lista global 
-            {
-                if (d.x == j && d.y == i) 
-                {
-                    std::cout << DINERO;
-                    hayDinero = true;
-                    break;
-                }
-            }
-            if (hayDinero) continue;
-
-            // Dibujar peatones
-            bool hayPeaton = false;
-            for (const Peaton& p : peatones) 
-            {
-                if (p.x == j && p.y == i && !p.isDead) 
-                {
-                    std::cout << PEATON;
-                    hayPeaton = true;
-                    break;
-                }
-            }
-            if (!hayPeaton) std::cout << mapa[i][j];
-        }
-        std::cout << "\n";
+        cells[i][sep1] = Cell(CellType::WALL);
+        cells[i][sep2] = Cell(CellType::WALL);
     }
-    std::cout << "Dinero: $" << cj.dinero << "\n";
+
+    int bridgeY = height / 2;
+    cells[bridgeY][sep1] = Cell(CellType::BRIDGE);
+    cells[bridgeY][sep2] = Cell(CellType::BRIDGE);
+}
+
+void Map::Cleanup()
+{
+    //dealloc map memory 
+    if (cells != nullptr)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            delete[] cells[i];
+        }
+        delete[] cells;
+        cells = nullptr;
+    }
+}
+
+bool Map::IsWalkable(int x, int y) const
+{
+    if (x < 0 || x >= width || y < 0 || y >= height)
+    {
+        return false;
+    }
+    return cells[y][x].type != CellType::WALL;
+}
+
+char Map::GetCellDisplayChar(int x, int y) const
+{
+    if (x < 0 || x >= width || y < 0 || y >= height)
+    {
+        return ' ';
+    }
+
+    switch (cells[y][x].type)
+    {
+        case CellType::WALL:
+            return 'X';
+
+        case CellType::BRIDGE:
+            return ' ';
+
+        case CellType::EMPTY:
+
+        default:
+            return ' ';
+    }
 }

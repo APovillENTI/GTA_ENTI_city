@@ -1,61 +1,73 @@
 #pragma once
-#include <vector>
-#include <string>
+#include <string> 
 
-const char WALL = 'X';
-const char EMPTY = ' ';
-const char PEATON = 'P';
-const char DINERO = '$';
-
-struct Config;
-struct Carl;
-struct Peaton;
-struct Dinero;
-
-//guardar los datos de configuracion del mapa aquí
-struct Config 
+enum class CellType
 {
-    int anchoMapa, altoMapa;
-    int numPeatonesLS, dineroCruzarSF, maxDineroLS;
-    int numPeatonesSF, dineroCruzarLV, maxDineroSF;
+    EMPTY,
+    WALL,
+    BRIDGE
 };
 
-struct Carl 
+struct Cell
 {
-    int x, y;
-    char direccion;
-    int dinero;
+    CellType type;
 
-    Carl() : x(0), y(0), direccion('v'), dinero(0) {} // predeterminar valores a 0 pq sino da error :/
-
-    Carl(int X, int Y, char dir, int Din)
-    {
-        x = X;
-        y = Y;
-        direccion = dir;
-        dinero = Din;
-    }
+    Cell() : type(CellType::EMPTY) {}
+    Cell(CellType t) : type(t) {}
 };
 
-struct Dinero 
+class Config
 {
-    int x, y;
-    int cantidad;
+private:
+    int mapWidth;
+    int mapHeight;
+    int numPeatonesLS;
+    int dineroCruzarSF;
+    int maxDineroLS;
+    int numPeatonesSF;
+    int dineroCruzarLV;
+    int maxDineroSF;
+    int numCochesLS;
+    int numCochesSF;
+    int numCochesLV;
 
-    Dinero(int posX, int posY, int cant)
-    {
-        x = posX;
-        y = posY;
-        cantidad = cant;
-    }
+public:
+    Config();
+    bool LoadFromFile(const std::string& filename);
+
+    // Getters
+    int GetMapWidth() const { return mapWidth; }
+    int GetMapHeight() const { return mapHeight; }
+    int GetNumPeatonesLS() const { return numPeatonesLS; }
+    int GetDineroCruzarSF() const { return dineroCruzarSF; }
+    int GetMaxDineroLS() const { return maxDineroLS; }
+    int GetNumPeatonesSF() const { return numPeatonesSF; }
+    int GetDineroCruzarLV() const { return dineroCruzarLV; }
+    int GetMaxDineroSF() const { return maxDineroSF; }
+    int GetNumCochesLS() const { return numCochesLS; }
+    int GetNumCochesSF() const { return numCochesSF; }
+    int GetNumCochesLV() const { return numCochesLV; }
 };
 
-// Variables globales
-extern Carl cjGlobal;
-extern std::vector<Peaton> peatonesGlobales;
-extern std::vector<Dinero> dineroGlobal;
+class Map
+{
+private:
+    Cell** cells;
+    int width;
+    int height;
 
-// Funciones
-void LeerConfig(const std::string& archivo, Config& config);
-void InicializarMapa(char**& mapa, const Config& config);
-void DibujarVista(char** mapa, const Carl& cj, const Config& config, const std::vector<Peaton>& peatones);
+    void CreateBridges();
+
+public:
+    Map();
+    ~Map();
+
+    bool Initialize(const Config& config);
+    void Cleanup();
+
+    bool IsWalkable(int x, int y) const;
+    char GetCellDisplayChar(int x, int y) const;
+
+    int GetWidth() const { return width; }
+    int GetHeight() const { return height; }
+};

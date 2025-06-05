@@ -1,48 +1,38 @@
 #pragma once
 #include "Map.h"
+#include "Player.h"
+//same functions as WALKER.h, diferent name
 
-struct Peaton 
+enum class MovementType
 {
-    int x, y;
+    HORIZONTAL,
+    VERTICAL
+};
+
+class Peaton
+{
+private:
+    int x;
+    int y;
     bool isDead;
-    char movimiento; // H para horizontal o V para vertical
-    int isla;
+    MovementType movementType;
+    int islandId;
 
-    Peaton(int posx, int posy, int islaIdx) 
-    {
-        x = posx;
-        y = posy;
-        isDead = false;
-        isla = islaIdx;
-        movimiento = (rand() % 2 == 0) ? 'H' : 'V';
-    }
+    bool IsPlayerNearby(const Player& player) const;
 
-    // Verificar si CJ está cerca
-    bool CJEstaCerca(const Carl& cj) 
-    {
-        return (abs(x - cj.x) <= 1 && abs(y - cj.y) <= 1);
-    }
+public:
+    Peaton(int startX, int startY, int island);
 
-    // Mover peatón aleatoriamente evitando paredes
-    void Mover(char** mapa, int anchoMapa, int altoMapa) 
-    {
-        if (isDead || CJEstaCerca(cjGlobal)) return; //Parar si el jugador esta cerca
+    // Getters
+    int GetX() const { return x; }
+    int GetY() const { return y; }
+    bool IsDead() const { return isDead; }
+    int GetIslandId() const { return islandId; }
 
-        if (movimiento == 'H') 
-        {
-            int dx = (rand() % 2 == 0) ? 1 : -1; // direccion random 
-            if (x + dx >= 0 && x + dx < anchoMapa && mapa[y][x + dx] != WALL) //comproba si la nueva posicion es valida
-            {
-                x += dx;
-            }
-        }
-        else 
-        {
-            int dy = (rand() % 2 == 0) ? 1 : -1; // lo mismo verticalmente
-            if (y + dy >= 0 && y + dy < altoMapa && mapa[y + dy][x] != WALL) 
-            {
-                y += dy;
-            }
-        }
-    }
+    // Métodos principales
+    void Update(const Map& gameMap, const Player& player);
+    void Kill();
+
+    // Métodos de movimiento
+    void Move(const Map& gameMap);
 };
