@@ -3,15 +3,13 @@
 #include <cmath>
 #include <algorithm>
 
-Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower) : islandId(id), maxMoney(maxMoneyAmount), 
-pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(0)
+Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower) : islandId(id), maxMoney(maxMoneyAmount), pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(0)
 {
     peatones.reserve(numPeatones);
     moneyDrops.reserve(20);
 }
 
-Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower, int numCarAmount) : islandId(id), maxMoney(maxMoneyAmount),
-pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(numCarAmount)
+Island::Island(int id, int numPeatones, int maxMoneyAmount, int maxPedestrianHealth, int pedestrianPower, int numCarAmount) : islandId(id), maxMoney(maxMoneyAmount), pedestrianHealth(maxPedestrianHealth), pedestrianAttackPower(pedestrianPower), numCars(numCarAmount)
 {
     peatones.reserve(numPeatones);
     cars.reserve(numCars);
@@ -191,7 +189,6 @@ void Island::DropMoney(int x, int y, const Map& gameMap)
 
 void Island::ProcessMoneyCollection(Player& player)
 {
-    // Only collect money if player is not driving
     if (player.IsDriving())
         return;
 

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BigSmoke.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="Island.cpp" />
@@ -136,6 +137,7 @@
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BigSmoke.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="Island.h" />

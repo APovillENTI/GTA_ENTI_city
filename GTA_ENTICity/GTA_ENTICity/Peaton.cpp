@@ -2,8 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 
-Peaton::Peaton(int startX, int startY, int initialHealth, int power, int island) : x(startX), y(startY), isDead(false), 
-health(initialHealth), attackPower(power), islandId(island), isBeingAttacked(false)
+Peaton::Peaton(int startX, int startY, int initialHealth, int power, int island) : x(startX), y(startY), isDead(false),  health(initialHealth), attackPower(power), islandId(island), isBeingAttacked(false)
 {
     //random direction at start
     movementType = (rand() % 2 == 0) ? MovementType::HORIZONTAL : MovementType::VERTICAL;

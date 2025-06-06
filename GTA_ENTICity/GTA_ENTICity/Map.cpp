@@ -116,8 +116,8 @@ bool Map::Initialize(const Config& config)
 {
     width = config.GetMapWidth();
     height = config.GetMapHeight();
-    moneyLS = config.GetDineroCruzarSF();
-    moneySF = config.GetDineroCruzarLV();
+    moneySF = config.GetDineroCruzarSF();
+    moneyLS = config.GetDineroCruzarLV();
 
     // allocate memory
     cells = new Cell * [height];

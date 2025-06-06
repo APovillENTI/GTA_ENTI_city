@@ -3,13 +3,18 @@
 #include <conio.h>
 #include <Windows.h>
 
-GameEngine::GameEngine() : isRunning(false), actualScene(Scene::MAIN_MENU)
+GameEngine::GameEngine() : isRunning(false), actualScene(Scene::MAIN_MENU), bigSmoke(nullptr)
 {
 }
 
 GameEngine::~GameEngine()
 {
     Shutdown();
+    if (bigSmoke != nullptr)
+    {
+        delete bigSmoke;
+        bigSmoke = nullptr;
+    }
 }
 
 void GameEngine::MainMenu()
@@ -55,6 +60,20 @@ bool GameEngine::Initialize(const std::string& configFile)
     islands.emplace_back(0, config.GetNumPeatonesLS(), config.GetMaxDineroLS(), config.GetMaxHealthLS(), config.GetPwrLS(), config.GetNumCochesLS());
     islands.emplace_back(1, config.GetNumPeatonesSF(), config.GetMaxDineroSF(), config.GetMaxHealthSF(), config.GetPwrSF(), config.GetNumCochesSF());
     islands.emplace_back(2, config.GetNumPeatonesLV(), config.GetMaxDineroLV(), config.GetMaxHealthLV(), config.GetPwrLV(), config.GetNumCochesLV()); // Las Venturas - change later
+
+    if (bigSmoke != nullptr)
+    {
+        delete bigSmoke;
+    }
+
+    int islandWidth = gameMap.GetWidth() / 3;
+    int startX = 2 * islandWidth + 1; // Third island
+    int endX = startX + islandWidth - 2;
+    int smokeX = startX + (rand() % (endX - startX + 1));
+    int smokeY = 1 + (rand() % (gameMap.GetHeight() - 2));
+
+    bigSmoke = new BigSmoke(smokeX, smokeY, 300, 25);//helth and power
+
 
     // Generate initial peatones and cars for each island
     for (Island& island : islands)
@@ -148,7 +167,6 @@ void GameEngine::ProcessInput()
     {
         if (!player.IsDriving())
         {
-            // Try to enter a nearby car
             for (Island& island : islands)
             {
                 Car* nearestCar = island.GetNearestCar(player);
@@ -193,6 +211,16 @@ void GameEngine::ProcessInput()
         {
             island.ProcessPlayerAttack(player, gameMap);
         }
+
+        if (bigSmoke != nullptr && !bigSmoke->IsDead() && player.IsAdjacentTo(bigSmoke->GetX(), bigSmoke->GetY()))
+        {
+            bigSmoke->GetDamage(player.GetPower());
+            if (bigSmoke->GetHP() <= 0)
+            {
+                bigSmoke->Kill();
+                actualScene = Scene::END_GAME;
+            }
+        }
     }
 }
 
@@ -213,6 +241,18 @@ void GameEngine::Update()
                 island.ProcessCarHitPeaton(player, gameMap);
             }
         }
+
+        if (bigSmoke != nullptr && !bigSmoke->IsDead())
+        {
+            bigSmoke->Update(gameMap, player);
+
+            if (bigSmoke->ShouldAttackPlayer(player) && !player.IsDriving())
+            {
+                int currentHealth = player.GetHealth();
+                player.SetHealth(currentHealth - bigSmoke->GetPower());
+            }
+        }
+
     }
     else
     {
@@ -254,13 +294,17 @@ void GameEngine::Render()
 
 char GameEngine::GetDisplayCharAt(int x, int y) const
 {
-    // Check if player is at this position and not driving
     if (player.GetX() == x && player.GetY() == y && !player.IsDriving())
     {
         return player.GetDirectionChar();
     }
 
-    // Check for cars (including driven cars)
+    if (bigSmoke != nullptr && !bigSmoke->IsDead() && bigSmoke->GetX() == x && bigSmoke->GetY() == y)
+    {
+        return 'B';
+    }
+
+    // Check for cars 
     for (const Island& island : islands)
     {
         if (island.HasCarAt(x, y))
@@ -268,7 +312,7 @@ char GameEngine::GetDisplayCharAt(int x, int y) const
             return 'C';
         }
 
-        // Check if there's a car being driven at this position
+        // Check for driven cars
         for (const Car& car : island.GetCars())
         {
             if (car.IsBeingDriven() && car.GetX() == x && car.GetY() == y)

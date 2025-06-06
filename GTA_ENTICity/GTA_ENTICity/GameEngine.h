@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <Windows.h>
+#include "BigSmoke.h"
 
 enum class Scene {
     MAIN_MENU,
@@ -20,6 +21,7 @@ private:
 
     Map gameMap;
     Player player;
+    BigSmoke* bigSmoke;
     Scene actualScene;
     std::vector<Island> islands;
     bool isRunning;
