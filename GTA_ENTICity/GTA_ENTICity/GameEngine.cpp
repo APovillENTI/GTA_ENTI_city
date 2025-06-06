@@ -3,13 +3,33 @@
 #include <conio.h>
 #include <Windows.h>
 
-GameEngine::GameEngine() : isRunning(false)
+GameEngine::GameEngine() : isRunning(false), actualScene(Scene::MAIN_MENU)
 {
 }
 
 GameEngine::~GameEngine()
 {
     Shutdown();
+}
+
+void GameEngine::MainMenu()
+{
+    system("cls");
+    std::cout << "GTA ENTI CITY" << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    if (cursorOnPlay)
+        std::cout << "PLAY <  EXIT GAME " << std::endl;
+    else
+        std::cout << "PLAY    EXIT GAME <" << std::endl;
+}
+
+void GameEngine::EndGame()
+{
+    system("cls");
+    std::cout << "GAME OVER!" << std::endl;
+    std::cout << std::endl;
+    std::cout << "(PRESS SPACE)" << std::endl;
 }
 
 bool GameEngine::Initialize(const std::string& configFile)
@@ -51,10 +71,24 @@ void GameEngine::Run()
 {
     while (isRunning)
     {
-        ProcessInput();
-        Update();
-        Render();
-        Sleep(1000 / NUM_FPS);
+        switch (actualScene)
+        {
+        case (Scene::MAIN_MENU):
+            ProcessInput();
+            Sleep(1000 / NUM_FPS);
+            break;
+        case (Scene::PLAY_SCENE):
+            ProcessInput();
+            Update();
+            Render();
+            Sleep(1000 / NUM_FPS);
+            break;
+        case (Scene::END_GAME):
+            EndGame();
+            ProcessInput();
+            Sleep(1000 / NUM_FPS);
+            break;
+        }
     }
 }
 
@@ -73,6 +107,39 @@ void GameEngine::ProcessInput()
     if (KeyPressed(VK_ESCAPE))
     {
         isRunning = false;
+        return;
+    }
+
+    if (actualScene == Scene::MAIN_MENU)
+    {
+        if (KeyPressed(VK_LEFT) || KeyPressed('A'))
+        {
+            cursorOnPlay = true;
+            MainMenu();
+        }
+        if (KeyPressed(VK_RIGHT) || KeyPressed('D'))
+        {
+            cursorOnPlay = false;
+            MainMenu();
+        }
+        if (KeyPressed(VK_SPACE))
+        {
+            if (cursorOnPlay)
+                actualScene = Scene::PLAY_SCENE;
+            else
+                isRunning = false;
+        }
+        return;
+    }
+
+    if (actualScene == Scene::END_GAME)
+    {
+        if (KeyPressed(VK_SPACE))
+        {
+            actualScene = Scene::MAIN_MENU;
+            Initialize("config.txt");
+            MainMenu();
+        }
         return;
     }
 
@@ -120,7 +187,8 @@ void GameEngine::ProcessInput()
         player.Move(1, 0, gameMap);
         player.SetDirection(Direction::RIGHT);
     }
-
+    else if (KeyPressed('J')) // Para probar que funciona el endgame, hay que quitarlo
+        player.SetHealth(player.GetHealth() - 10); // Le quita 10 de vida al player
     if (KeyPressed(VK_SPACE) && !player.IsDriving())
     {
         for (Island& island : islands)
@@ -133,15 +201,22 @@ void GameEngine::ProcessInput()
 void GameEngine::Update()
 {
     // Update islandsa
-    for (Island& island : islands)
+    if (player.GetHealth() > 0)
     {
-        island.UpdatePeatones(gameMap, player);
-        island.ProcessMoneyCollection(player);
-
-        if (player.IsDriving())
+        for (Island& island : islands)
         {
-            island.ProcessCarHitPeaton(player, gameMap);
+            island.UpdatePeatones(gameMap, player);
+            island.ProcessMoneyCollection(player);
+
+            if (player.IsDriving())
+            {
+                island.ProcessCarHitPeaton(player, gameMap);
+            }
         }
+    }
+    else
+    {
+        actualScene = Scene::END_GAME;
     }
 }
 

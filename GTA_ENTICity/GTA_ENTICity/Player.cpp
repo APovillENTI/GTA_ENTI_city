@@ -88,6 +88,7 @@ bool Player::Move(int dx, int dy, const Map& gameMap)
                         gameMap.EraseBridge(newX, newY);
                     }
                     else
+                        health = 0;
                         return false;
                 }           
             }

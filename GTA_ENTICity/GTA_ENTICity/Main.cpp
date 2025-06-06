@@ -12,6 +12,7 @@ int main()
         return -1;
     }
 
+    game.MainMenu();
     game.Run();
 
     return 0;
