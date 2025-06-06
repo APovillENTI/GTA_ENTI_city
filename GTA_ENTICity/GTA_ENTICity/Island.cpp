@@ -117,6 +117,27 @@ void Island::ProcessPlayerAttack(const Player& player, const Map& gameMap)
     }
 }
 
+void Island::ProcessPeatonAttacks(Player& player)
+{
+    if (player.IsDriving())
+        return;
+
+    for (auto& peaton : peatones)
+    {
+        if (!peaton.IsDead() && peaton.ShouldAttackPlayer())
+        {
+            if (player.IsAdjacentTo(peaton.GetX(), peaton.GetY()))
+            {
+                int currentHealth = player.GetHealth();
+                player.SetHealth(currentHealth - peaton.GetPower());
+
+                // Update attack time
+                peaton.StartBeingAttacked();
+            }
+        }
+    }
+}
+
 void Island::ProcessCarHitPeaton(const Player& player, const Map& gameMap)
 {
     if (!player.IsDriving() || player.GetCurrentCar() == nullptr)

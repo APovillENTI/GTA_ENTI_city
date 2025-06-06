@@ -187,8 +187,6 @@ void GameEngine::ProcessInput()
         player.Move(1, 0, gameMap);
         player.SetDirection(Direction::RIGHT);
     }
-    else if (KeyPressed('J')) // Para probar que funciona el endgame, hay que quitarlo
-        player.SetHealth(player.GetHealth() - 10); // Le quita 10 de vida al player
     if (KeyPressed(VK_SPACE) && !player.IsDriving())
     {
         for (Island& island : islands)
@@ -207,6 +205,8 @@ void GameEngine::Update()
         {
             island.UpdatePeatones(gameMap, player);
             island.ProcessMoneyCollection(player);
+
+            island.ProcessPeatonAttacks(player);
 
             if (player.IsDriving())
             {

@@ -3,10 +3,15 @@
 #include <cmath>
 
 Peaton::Peaton(int startX, int startY, int initialHealth, int power, int island) : x(startX), y(startY), isDead(false), 
-health(initialHealth), attackPower(power), islandId(island)
+health(initialHealth), attackPower(power), islandId(island), isBeingAttacked(false)
 {
     //random direction at start
     movementType = (rand() % 2 == 0) ? MovementType::HORIZONTAL : MovementType::VERTICAL;
+
+    //50% agressive
+    behavior = (rand() % 2 == 0) ? PeatonBehavior::NEUTRAL : PeatonBehavior::AGGRESSIVE;
+
+    lastAttackTime = std::chrono::steady_clock::now();
 }
 
 bool Peaton::IsPlayerNearby(const Player& player) const
@@ -30,11 +35,18 @@ void Peaton::Update(const Map& gameMap, const Player& player)
 void Peaton::GetDamage(const int damage)
 {
     health -= damage;
+
+    if (behavior == PeatonBehavior::AGGRESSIVE && !isBeingAttacked)
+    {
+        isBeingAttacked = true;
+        lastAttackTime = std::chrono::steady_clock::now();
+    }
 }
 
 void Peaton::Kill()
 {
     isDead = true;
+    isBeingAttacked = false;
 }
 
 void Peaton::Move(const Map& gameMap)
@@ -59,4 +71,26 @@ void Peaton::Move(const Map& gameMap)
             y = newY;
         }
     }
+}
+
+bool Peaton::CanAttack() const
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    auto timeSinceLastAttack = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastAttackTime);
+
+    return timeSinceLastAttack.count() > 1000;
+}
+
+void Peaton::StartBeingAttacked()
+{
+    if (behavior == PeatonBehavior::AGGRESSIVE)
+    {
+        isBeingAttacked = true;
+        lastAttackTime = std::chrono::steady_clock::now();
+    }
+}
+
+bool Peaton::ShouldAttackPlayer() const
+{
+    return behavior == PeatonBehavior::AGGRESSIVE && isBeingAttacked && CanAttack();
 }

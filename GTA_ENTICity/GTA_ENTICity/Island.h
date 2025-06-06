@@ -36,6 +36,7 @@ public:
     void GenerateInitialCars(int mapWidth, int mapHeight);
     void UpdatePeatones(const Map& gameMap, const Player& player);
     void ProcessPlayerAttack(const Player& player, const Map& gameMap);
+    void ProcessPeatonAttacks(Player& player);
     void ProcessMoneyCollection(Player& player);
     void ProcessCarHitPeaton(const Player& player, const Map& gameMap);
 
